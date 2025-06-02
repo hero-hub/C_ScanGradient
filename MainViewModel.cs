@@ -30,7 +30,7 @@ namespace C_ScanGradient
 
         public Image SignalAnalyse()
         {
-            string directoryPath = @"D:\WORK\C_ScanGradient\signals";
+            string directoryPath = @"D:\WORK\signals";
             string[] filePaths = Directory.GetFiles(directoryPath, "*.txt");
             double[] maxValue = new double[filePaths.Length];
 
