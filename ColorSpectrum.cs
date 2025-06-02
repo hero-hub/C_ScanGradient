@@ -56,7 +56,7 @@ namespace C_ScanGradient
                 Width = 512,
                 Height = 150,
                 Stretch = Stretch.Fill // растягивает изображение, заполняя заданную высоту
-            };
+            }; 
 
             return image;
         }
