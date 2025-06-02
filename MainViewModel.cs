@@ -3,32 +3,32 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
+using System.Windows.Controls;
 
 namespace C_ScanGradient
 {
     public class MainViewModel : INotifyPropertyChanged
     {
-        private ImageSource _image;
+        //private ImageSource _image;
         private ColorSpectrum _colorSpectrum = new ColorSpectrum();
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public ImageSource image
-        {
-            get => _image;
-            set
-            {
-                _image = value;
-                OnPropertyChanged(nameof(image));
-            }
-        }
+        //public ImageSource image
+        //{
+        //    get => _image;
+        //    set
+        //    {
+        //        _image = value;
+        //        OnPropertyChanged(nameof(image));
+        //    }
+        //}
 
         public MainViewModel()
         {
             SignalAnalyse();
         }
 
-        public void SignalAnalyse()
+        public Image SignalAnalyse()
         {
             string directoryPath = @"D:\WORK\C_ScanGradient\signals";
             string[] filePaths = Directory.GetFiles(directoryPath, "*.txt");
@@ -44,7 +44,7 @@ namespace C_ScanGradient
                 }
                 maxValue[signalIndex] = max + 2.0;
             }
-            image = _colorSpectrum.BitmapDrawer(maxValue).Source;
+            return _colorSpectrum.BitmapDrawer(maxValue);
         }
 
         private List<double> LoadDataFromFile(string filePath)
