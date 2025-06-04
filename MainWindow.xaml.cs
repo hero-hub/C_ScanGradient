@@ -14,11 +14,7 @@ namespace C_ScanGradient
         public MainWindow()
         {
             InitializeComponent();
-            MainViewModel mainVM = new MainViewModel();
-            
-            Grid grid = new Grid();
-            grid.Children.Add(mainVM.SignalAnalyse());
-            this.Content = grid;
+            DataContext = new MainViewModel();
         }
     }
 }

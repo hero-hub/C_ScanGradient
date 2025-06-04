@@ -4,9 +4,31 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:C_ScanGradient"
+        d:DataContext="{d:DesignInstance Type=local:MainViewModel}"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <Image Source="{Binding image}"/>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="35"/>
+            <RowDefinition Height="35"/>
+            <RowDefinition Height="35"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="Контраст [дБ] от:" Margin="5" />
+        <TextBox Grid.Row="0" Text="{Binding FirstContrast, UpdateSourceTrigger=PropertyChanged}" Width="100" Margin="5"/>
+
+        <TextBlock Grid.Row="1" Text="Контраст [дБ] до:" Margin="5" />
+        <TextBox Grid.Row="1" Text="{Binding LastContrast, UpdateSourceTrigger=PropertyChanged}" Width="100" Margin="5"/>
+        <Button 
+            Grid.Row="2"
+            Content="Спектр" 
+            Width="50" Margin="5" 
+            Command="{Binding SpectrCommand}"
+            FontFamily="Century Gothic"/>
+        
+        <Image Grid.Row="3" Source="{Binding Image.Source}"/>
+
     </Grid>
 </Window>

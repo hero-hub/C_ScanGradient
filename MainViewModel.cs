@@ -4,6 +4,8 @@ using System.ComponentModel;
 using System.IO;
 using System.Windows.Media;
 using System.Windows.Controls;
+using System.Windows.Documents;
+using System.Windows.Input;
 
 namespace C_ScanGradient
 {
@@ -13,22 +15,44 @@ namespace C_ScanGradient
         private ColorSpectrum _colorSpectrum = new ColorSpectrum();
         public event PropertyChangedEventHandler PropertyChanged;
 
-        //public ImageSource image
-        //{
-        //    get => _image;
-        //    set
-        //    {
-        //        _image = value;
-        //        OnPropertyChanged(nameof(image));
-        //    }
-        //}
+        public ICommand SpectrCommand { get; }
 
+        public string FirstContrast { get; set; } = string.Empty;
+        public string LastContrast { get; set; } = string.Empty;
+
+        private Image _image;
+        public Image Image
+        {
+            get => _image;
+            set
+            {
+                _image = value;
+                OnPropertyChanged(nameof(Image));
+            }
+        }
         public MainViewModel()
         {
-            SignalAnalyse();
+            SpectrCommand = new RelayCommand(_ => SpectrBilding());
         }
+        public void SpectrBilding()
+        {
+            double first = 0.0;
+            double last = 0.0;
+            if (double.TryParse(FirstContrast, System.Globalization.NumberStyles.Any,
+                System.Globalization.CultureInfo.InvariantCulture, out double value))
+            {
+                first = value;
+            }
 
-        public Image SignalAnalyse()
+            if (double.TryParse(LastContrast, System.Globalization.NumberStyles.Any,
+                            System.Globalization.CultureInfo.InvariantCulture, out double value1))
+            {
+                last = value1;
+            }
+
+            Image = _colorSpectrum.BitmapDrawer(SignalAnalyse(first), first, last);
+        }
+        public double[] SignalAnalyse(double first)
         {
             string directoryPath = @"D:\WORK\signals";
             string[] filePaths = Directory.GetFiles(directoryPath, "*.txt");
@@ -42,9 +66,9 @@ namespace C_ScanGradient
                 {
                     if (Math.Abs(values[value]) > max) max = values[value];
                 }
-                maxValue[signalIndex] = max + 2.0;
+                maxValue[signalIndex] = max - first;
             }
-            return _colorSpectrum.BitmapDrawer(maxValue);
+            return maxValue;
         }
 
         private List<double> LoadDataFromFile(string filePath)

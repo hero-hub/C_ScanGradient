@@ -12,10 +12,11 @@ namespace C_ScanGradient
             
         }
         
-        public Image BitmapDrawer(double[] values)
+        public Image BitmapDrawer(double[] values, double first, double last)
         {
             WriteableBitmap bitmap = new WriteableBitmap(values.Length, 1, 96, 96, PixelFormats.Bgr32, null);
             byte[] pixels = new byte[values.Length * 4]; // 4 байта на пиксель (BGRA)
+            double diapos = last - first;
 
             for (int x = 0; x < values.Length; x++)
             {
@@ -26,7 +27,7 @@ namespace C_ScanGradient
                     greenChanel = 0;
                     redChanel = 0;
                 }
-                else if (values[x] > 3.3)
+                else if (values[x] > diapos)
                 {
                     blueChanel = 255;
                     greenChanel = 255;
@@ -34,9 +35,9 @@ namespace C_ScanGradient
                 }
                 else
                 {
-                    blueChanel = -93.66 * values[x] * values[x] + 255;
-                    greenChanel = -93.66 * (values[x] - 1.65) * (values[x] - 1.65) + 255;
-                    redChanel = -93.66 * (values[x] - 3.3) * (values[x] - 3.3) + 255;
+                    blueChanel = -255/ (diapos * diapos / 4) * values[x] * values[x] + 255;
+                    greenChanel = -255 / (diapos * diapos / 4) * (values[x] - diapos / 2) * (values[x] - diapos / 2) + 255;
+                    redChanel = -255 / (diapos * diapos / 4) * (values[x] - diapos) * (values[x] - diapos) + 255;
                 }
 
                 byte blue = (byte)Math.Clamp(blueChanel, 0, 255);
@@ -53,8 +54,8 @@ namespace C_ScanGradient
             Image image = new Image
             {
                 Source = bitmap,
-                Width = 512,
-                Height = 150,
+                Width = 1024,
+                Height = 5000,
                 Stretch = Stretch.Fill // растягивает изображение, заполняя заданную высоту
             }; 
 
