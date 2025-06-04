@@ -9,7 +9,6 @@ namespace C_ScanGradient
     {
         public ColorSpectrum() 
         { 
-            
         }
         
         public Image BitmapDrawer(double[] values, double first, double last)
@@ -21,6 +20,7 @@ namespace C_ScanGradient
             for (int x = 0; x < values.Length; x++)
             {
                 double blueChanel, greenChanel, redChanel;
+
                 if (values[x] < 0)
                 {
                     blueChanel = 0;
@@ -54,11 +54,10 @@ namespace C_ScanGradient
             Image image = new Image
             {
                 Source = bitmap,
-                Width = 1024,
-                Height = 5000,
+                Width = 600,
+                Height = 300,
                 Stretch = Stretch.Fill // растягивает изображение, заполняя заданную высоту
-            }; 
-
+            };
             return image;
         }
 

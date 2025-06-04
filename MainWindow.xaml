@@ -27,8 +27,8 @@
             Width="50" Margin="5" 
             Command="{Binding SpectrCommand}"
             FontFamily="Century Gothic"/>
-        
-        <Image Grid.Row="3" Source="{Binding Image.Source}"/>
+
+        <Image Grid.Row="3" Source="{Binding Image.Source}" Stretch="Fill" Height="300" Width="600"/>
 
     </Grid>
 </Window>
