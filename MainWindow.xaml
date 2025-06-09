@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:C_ScanGradient"
+        xmlns:oxy="http://oxyplot.org/wpf"
         d:DataContext="{d:DesignInstance Type=local:MainViewModel}"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
@@ -14,21 +15,39 @@
             <RowDefinition Height="35"/>
             <RowDefinition Height="35"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Text="Контраст [дБ] от:" Margin="5" />
-        <TextBox Grid.Row="0" Text="{Binding FirstContrast, UpdateSourceTrigger=PropertyChanged}" Width="100" Margin="5"/>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="4*"/>
+        </Grid.ColumnDefinitions>
 
-        <TextBlock Grid.Row="1" Text="Контраст [дБ] до:" Margin="5" />
-        <TextBox Grid.Row="1" Text="{Binding LastContrast, UpdateSourceTrigger=PropertyChanged}" Width="100" Margin="5"/>
+        <TextBlock Grid.Row="0" Text="Контраст [дБ] от:" Margin="5,5,5,5" />
+        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding FirstContrast, UpdateSourceTrigger=PropertyChanged}" Width="50" Margin="25,5,25,5"/>
+
+        <TextBlock Grid.Row="1" Text="Контраст [дБ] до:" Margin="5,5,5,5" />
+        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding LastContrast, UpdateSourceTrigger=PropertyChanged}" Width="50" Margin="25,5,25,5"/>
         <Button 
             Grid.Row="2"
-            Content="Спектр" 
-            Width="50" Margin="5" 
+            Content="C_Scan" 
+            Width="50" Margin="25,5,25,5" 
             Command="{Binding SpectrCommand}"
             FontFamily="Century Gothic"/>
 
-        <Image Grid.Row="3" Source="{Binding Image.Source}" Stretch="Fill" Height="300" Width="600"/>
+        <oxy:PlotView x:Name="plotView" 
+            Grid.Row="3"
+            Grid.ColumnSpan="3"
+            Model="{Binding PlotModel}"
+            Margin="5,5,5,30"/>
+
+        <Image Grid.Row="3" Grid.Column ="3" Source="{Binding Image.Source}" Stretch="Fill" Margin="5"/>
+        
+        <Slider Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="4" Margin="5"
+                HorizontalAlignment="Center" VerticalAlignment="Bottom" Width="400"
+                Minimum="0" Maximum="1527" Value="{Binding SliderValue, Mode=TwoWay}"/>
 
     </Grid>
 </Window>
