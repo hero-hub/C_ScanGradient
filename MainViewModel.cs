@@ -97,7 +97,7 @@ namespace C_ScanGradient
             {
                 var values = LoadDataFromFile(filePaths[signalIndex]);
                 double max = 0.0;
-                for (int value = 1190; value < 2210; value++)
+                for (int value = 510; value < 850; value++)
                 {
                     if (Math.Abs(values[value]) > max) max = values[value];
                 }
@@ -163,7 +163,7 @@ namespace C_ScanGradient
             PlotModel.Axes.Add(new OxyPlot.Axes.LinearAxis
             {
                 Position = OxyPlot.Axes.AxisPosition.Left,
-                Title = "Величина сигнала",
+                Title = "дБ",
                 MajorGridlineStyle = LineStyle.Solid,
                 MinorGridlineStyle = LineStyle.Dot
             });

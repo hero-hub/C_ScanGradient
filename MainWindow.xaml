@@ -7,15 +7,15 @@
         xmlns:oxy="http://oxyplot.org/wpf"
         d:DataContext="{d:DesignInstance Type=local:MainViewModel}"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="500" Width="800">
     <Grid>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="35"/>
-            <RowDefinition Height="35"/>
-            <RowDefinition Height="35"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="30"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="12*"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
@@ -25,11 +25,12 @@
             <ColumnDefinition Width="4*"/>
         </Grid.ColumnDefinitions>
 
-        <TextBlock Grid.Row="0" Text="Контраст [дБ] от:" Margin="5,5,5,5" />
-        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding FirstContrast, UpdateSourceTrigger=PropertyChanged}" Width="50" Margin="25,5,25,5"/>
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="Контраст [дБ] от:" Margin="5,5,5,5" />
+        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding FirstContrast, UpdateSourceTrigger=PropertyChanged}" Width="50" Margin="5"/>
 
-        <TextBlock Grid.Row="1" Text="Контраст [дБ] до:" Margin="5,5,5,5" />
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="Контраст [дБ] до:" Margin="5,5,5,5" />
         <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding LastContrast, UpdateSourceTrigger=PropertyChanged}" Width="50" Margin="25,5,25,5"/>
+
         <Button 
             Grid.Row="2"
             Content="C_Scan" 
