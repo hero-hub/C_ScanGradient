@@ -18,6 +18,7 @@ namespace C_ScanGradient
         private Image _image;
         private int _sliderValue;
         private string[] _filePaths;
+        private string swapPhase = "";
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -44,7 +45,6 @@ namespace C_ScanGradient
                 OnPropertyChanged(nameof(PlotModel));
             }
         }
-
         public int SliderValue
         {
             get => _sliderValue;
@@ -58,10 +58,20 @@ namespace C_ScanGradient
                 }
             }
         }
+        public string SwapPhase
+        {
+            get => swapPhase;
+            set
+            {
+                swapPhase = value;
+                OnPropertyChanged(nameof(SwapPhase));
+            }
+        }
 
         public MainViewModel()
         {
             SetupPlot();
+            Task.Run(()=>DeterminePhaseAsync());
             string directoryPath = @"D:\WORK\signals";
             _filePaths = Directory.GetFiles(directoryPath, "*.txt");
 
@@ -96,7 +106,10 @@ namespace C_ScanGradient
             for (int signalIndex = 0; signalIndex < filePaths.Length; signalIndex++)
             {
                 var values = LoadDataFromFile(filePaths[signalIndex]);
+
+                //нахождение максимума
                 double max = 0.0;
+
                 for (int value = 510; value < 850; value++)
                 {
                     if (Math.Abs(values[value]) > max) max = values[value];
@@ -104,6 +117,55 @@ namespace C_ScanGradient
                 maxValue[signalIndex] = max - first;
             }
             return maxValue;
+        }
+        // Метод для определения фазы сигнала
+        private async Task DeterminePhaseAsync()
+        {
+            const int startIndex = 510;
+            const int endIndex = 850;
+            const double strob_A = -0.01;
+            const double  strob_B = 0.01;
+            int phase = 0;
+
+            string directoryPath = @"D:\WORK\signals";
+            string[] filePaths = Directory.GetFiles(directoryPath, "*.txt");
+
+            for (int signalIndex = 1200; signalIndex < filePaths.Length; signalIndex++)
+            {
+                var values = LoadDataFromFile(filePaths[signalIndex]);
+                int lowerCrossings = await CountCrossings(values, strob_A, startIndex, endIndex);
+                int upperCrossings = await CountCrossings(values, strob_B, startIndex, endIndex);
+
+                int signalPhase = 0;
+                //два пика по верхнему стробу
+                if (upperCrossings == 2 && lowerCrossings >= 1)
+                {
+                    signalPhase = 1;
+                }
+                //два пика по нижнему стробу
+                if (lowerCrossings == 2 && upperCrossings >= 1)
+                {
+                    signalPhase = 2;
+                }
+
+                if (phase != signalPhase)
+                {
+                    SwapPhase+=signalIndex + "\n";
+                }
+                phase = signalPhase;
+            }
+        }
+        private static Task<int> CountCrossings(List<double> signal, double level, int startIndex, int endIndex)
+        {
+            int crossings = 0;
+            for (int i = startIndex; i < endIndex && i < signal.Count - 1; i++)
+            {
+                if ((signal[i] - level) * (signal[i + 1] - level) < 0)
+                {
+                    crossings++;
+                }
+            }
+            return Task.FromResult(crossings);
         }
         private void PlotSignal(List<double> values, int signalIndex)
         {

@@ -7,7 +7,7 @@
         xmlns:oxy="http://oxyplot.org/wpf"
         d:DataContext="{d:DesignInstance Type=local:MainViewModel}"
         mc:Ignorable="d"
-        Title="MainWindow" Height="500" Width="800">
+        Title="MainWindow" Height="600" Width="800">
     <Grid>
 
         <Grid.RowDefinitions>
@@ -19,22 +19,22 @@
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="2*"/>
-            <ColumnDefinition Width="4*"/>
+            <ColumnDefinition Width="20*"/>
+            <ColumnDefinition Width="20*"/>
+            <ColumnDefinition Width="29*"/>
+            <ColumnDefinition Width="22*"/>
+            <ColumnDefinition Width="69*"/>
         </Grid.ColumnDefinitions>
 
         <TextBlock Grid.Row="0" Grid.Column="0" Text="Контраст [дБ] от:" Margin="5,5,5,5" />
-        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding FirstContrast, UpdateSourceTrigger=PropertyChanged}" Width="50" Margin="5"/>
+        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding FirstContrast, UpdateSourceTrigger=PropertyChanged}" Margin="25,5,25,5"/>
 
         <TextBlock Grid.Row="1" Grid.Column="0" Text="Контраст [дБ] до:" Margin="5,5,5,5" />
-        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding LastContrast, UpdateSourceTrigger=PropertyChanged}" Width="50" Margin="25,5,25,5"/>
+        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding LastContrast, UpdateSourceTrigger=PropertyChanged}" Margin="25,5,25,5"/>
 
         <Button 
             Grid.Row="2"
-            Content="C_Scan" 
-            Width="50" Margin="25,5,25,5" 
+            Content="C_Scan" Margin="25,5,25,5" 
             Command="{Binding SpectrCommand}"
             FontFamily="Century Gothic"/>
 
@@ -44,11 +44,23 @@
             Model="{Binding PlotModel}"
             Margin="5,5,5,30"/>
 
-        <Image Grid.Row="3" Grid.Column ="3" Source="{Binding Image.Source}" Stretch="Fill" Margin="5"/>
-        
-        <Slider Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="4" Margin="5"
-                HorizontalAlignment="Center" VerticalAlignment="Bottom" Width="400"
-                Minimum="0" Maximum="1527" Value="{Binding SliderValue, Mode=TwoWay}"/>
+        <Image Grid.Row="3" Grid.Column ="4" Source="{Binding Image.Source}" Stretch="Fill" Margin="5,5,5,5"/>
 
+        <Slider Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="4"
+                HorizontalAlignment="Center" VerticalAlignment="Center" Width="300"
+                Minimum="0" Maximum="1527" Value="{Binding SliderValue, Mode=TwoWay}" Height="18"/>
+
+        <TextBlock Grid.Row="2" Grid.Column="3" Text="Смена фазы:" Margin="5,5,5,5" />
+        <Border Grid.Row="3" Grid.Column="3"
+        BorderBrush="Gray" 
+        BorderThickness="1"
+        Margin="5,5,5,5">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <TextBlock Text="{Binding SwapPhase}" 
+                   Margin="5" 
+                   TextWrapping="Wrap" 
+                   FontSize="14"/>
+            </ScrollViewer>
+        </Border>
     </Grid>
 </Window>
