@@ -47,8 +47,8 @@
         <Image Grid.Row="3" Grid.Column ="4" Source="{Binding Image.Source}" Stretch="Fill" Margin="5,5,5,5"/>
 
         <Slider Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="4"
-                HorizontalAlignment="Center" VerticalAlignment="Center" Width="300"
-                Minimum="0" Maximum="1527" Value="{Binding SliderValue, Mode=TwoWay}" Height="18"/>
+                HorizontalAlignment="Center" VerticalAlignment="Center" Width="400"
+                Minimum="0" Maximum="{Binding SignalCount}" Value="{Binding SliderValue, Mode=TwoWay}" Height="20"/>
 
         <TextBlock Grid.Row="2" Grid.Column="3" Text="Смена фазы:" Margin="5,5,5,5" />
         <Border Grid.Row="3" Grid.Column="3"

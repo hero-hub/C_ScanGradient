@@ -18,7 +18,10 @@ namespace C_ScanGradient
         private Image _image;
         private int _sliderValue;
         private string[] _filePaths;
+        private int _signalCount;
         private string swapPhase = "";
+        private string directoryPath = @"C:\SavedSignals\Lud\defect";
+        //private string directoryPath = @"D:\WORK\signals";
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -58,6 +61,15 @@ namespace C_ScanGradient
                 }
             }
         }
+        public int SignalCount
+        {
+            get => _signalCount;
+            set
+            {
+                _signalCount = value;
+                OnPropertyChanged(nameof(SignalCount));
+            }
+        }
         public string SwapPhase
         {
             get => swapPhase;
@@ -71,10 +83,10 @@ namespace C_ScanGradient
         public MainViewModel()
         {
             SetupPlot();
-            Task.Run(()=>DeterminePhaseAsync());
-            string directoryPath = @"D:\WORK\signals";
             _filePaths = Directory.GetFiles(directoryPath, "*.txt");
+            _signalCount = _filePaths.Length;
 
+            Task.Run(()=>DeterminePhaseAsync(_filePaths));
             PlotSignal(LoadDataFromFile(_filePaths[_sliderValue]), _sliderValue);
             SpectrCommand = new RelayCommand(async _ => await SpectrBilding());
         }
@@ -99,18 +111,17 @@ namespace C_ScanGradient
         }
         public double[] SignalAnalyse(double first)
         {
-            string directoryPath = @"D:\WORK\signals";
-            string[] filePaths = Directory.GetFiles(directoryPath, "*.txt");
-            double[] maxValue = new double[filePaths.Length];
+            //string[] filePaths = Directory.GetFiles(directoryPath, "*.txt");
+            double[] maxValue = new double[_filePaths.Length];
 
-            for (int signalIndex = 0; signalIndex < filePaths.Length; signalIndex++)
+            for (int signalIndex = 0; signalIndex < _filePaths.Length; signalIndex++)
             {
-                var values = LoadDataFromFile(filePaths[signalIndex]);
+                var values = LoadDataFromFile(_filePaths[signalIndex]);
 
                 //нахождение максимума
                 double max = 0.0;
 
-                for (int value = 510; value < 850; value++)
+                for (int value = 3740; value < 4029; value++)
                 {
                     if (Math.Abs(values[value]) > max) max = values[value];
                 }
@@ -119,53 +130,62 @@ namespace C_ScanGradient
             return maxValue;
         }
         // Метод для определения фазы сигнала
-        private async Task DeterminePhaseAsync()
+        private async Task DeterminePhaseAsync(string[] filePaths)
         {
-            const int startIndex = 510;
-            const int endIndex = 850;
-            const double strob_A = -0.01;
-            const double  strob_B = 0.01;
-            int phase = 0;
+            const int startIndex = 3740;//22mсs
+            const int endIndex = 4029;//23.7mсs
+            //const double strob_A = -0.15;//нижний порог
+            //const double  strob_B = 0.15;//верхний порог
+            string previousPhase = "";
 
-            string directoryPath = @"D:\WORK\signals";
-            string[] filePaths = Directory.GetFiles(directoryPath, "*.txt");
-
-            for (int signalIndex = 1200; signalIndex < filePaths.Length; signalIndex++)
+            for (int signalIndex = 0; signalIndex < _filePaths.Length; signalIndex++)
             {
-                var values = LoadDataFromFile(filePaths[signalIndex]);
-                int lowerCrossings = await CountCrossings(values, strob_A, startIndex, endIndex);
-                int upperCrossings = await CountCrossings(values, strob_B, startIndex, endIndex);
+                var values = LoadDataFromFile(_filePaths[signalIndex]);
+                var phaseCrossings = await CountCrossings(values, startIndex, endIndex);
 
-                int signalPhase = 0;
-                //два пика по верхнему стробу
-                if (upperCrossings == 2 && lowerCrossings >= 1)
-                {
-                    signalPhase = 1;
-                }
-                //два пика по нижнему стробу
-                if (lowerCrossings == 2 && upperCrossings >= 1)
-                {
-                    signalPhase = 2;
-                }
+                string currentPhase = phaseCrossings.Aggregate("", (current, crossing) =>
+                    current + (crossing.IsStrobA ? "A" : "B"));
 
-                if (phase != signalPhase)
+                // Проверяем смену фазы
+                if (previousPhase != "" && currentPhase != previousPhase)
                 {
-                    SwapPhase+=signalIndex + "\n";
+                    SwapPhase += $"{signalIndex + 1}: {previousPhase} → {currentPhase} \n";
                 }
-                phase = signalPhase;
+                previousPhase = currentPhase;
+
+                await Task.Delay(1);
             }
         }
-        private static Task<int> CountCrossings(List<double> signal, double level, int startIndex, int endIndex)
+        private static async Task<List<(bool IsStrobA, int Index, double Value)>> CountCrossings(List<double> signal, int startIndex, int endIndex)
         {
-            int crossings = 0;
-            for (int i = startIndex; i < endIndex && i < signal.Count - 1; i++)
+            var peaks = new List<(bool IsStrobA, int Index, double Value)>();
+
+            for (int i = startIndex; i < endIndex; i++)
             {
-                if ((signal[i] - level) * (signal[i + 1] - level) < 0)
+                if (signal[i] < 0 && signal[i - 1] > signal[i] && signal[i] < signal[i + 1])
                 {
-                    crossings++;
+                    peaks.Add((true, i, signal[i]));
+                }
+                else if (signal[i] > 0 && signal[i - 1] < signal[i] && signal[i] > signal[i + 1])
+                {
+                    peaks.Add((false, i, signal[i]));
                 }
             }
-            return Task.FromResult(crossings);
+
+            peaks.Sort((a, b) => Math.Abs(b.Value).CompareTo(Math.Abs(a.Value)));
+
+            var selectedPeaks = new List<(bool IsStrobA, int Index, double Value)>();
+            for (int i = 0; i < peaks.Count && selectedPeaks.Count < 3; i++)
+            {
+                if (selectedPeaks.Count == 0 || selectedPeaks.Last().IsStrobA != peaks[i].IsStrobA)
+                {
+                    selectedPeaks.Add(peaks[i]);
+                }
+            }
+
+            selectedPeaks.Sort((a, b) => a.Index.CompareTo(b.Index));
+
+            return await Task.FromResult(selectedPeaks);
         }
         private void PlotSignal(List<double> values, int signalIndex)
         {
@@ -233,7 +253,7 @@ namespace C_ScanGradient
             PlotModel.Axes.Add(new OxyPlot.Axes.LinearAxis
             {
                 Position = OxyPlot.Axes.AxisPosition.Bottom,
-                Title = "Время (с)"
+                Title = "Время (мкс)"
             });
         }
         protected void OnPropertyChanged(string propertyName)
